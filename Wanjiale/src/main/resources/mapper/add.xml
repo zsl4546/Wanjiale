@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rng2.order.dao.AddDao">
+    <resultMap id="gx" type="com.rng2.order.bean.Dealer">
+        <id property="id" column="id"></id>
+        <result property="name" column="name"></result>
+        <result property="code" column="code"></result>
+        <result property="reg" column="reg"></result>
+        <collection property="shops" ofType="com.rng2.order.bean.Shop">
+            <id property="shopid" column="shopid"></id>
+            <result property="id" column="id"></result>
+            <result property="shopname" column="shopname"></result>
+        </collection>
+    </resultMap>
+
+    <select id="findDealer" resultMap="gx" parameterType="java.lang.Integer">
+        select d.id ,d.name, d.code, d.reg, s.shopid, s.shopname from dealer as d, shop as s
+        where d.id = s.id
+    </select>
+    <select id="findHouses" resultType="com.rng2.order.bean.Warehouse">
+        select w.id, w.name from warehouse as w
+    </select>
+    <select id="findProducts" resultType="com.rng2.order.bean.Product" parameterType="java.lang.Integer">
+        select id, houseid, `code`, model, category, quantity, invoicing, amount, volume
+        from products where houseid=#{houseId}
+    </select>
+    <insert id ="addOrder" parameterType="java.util.List" >
+        insert into  `order`
+        (userid, productid, num, orderid)
+        values
+         <foreach collection ="list" item="item" index= "index" separator =",">
+             (
+                #{item.userid}, #{item.id}, #{item.num}, #{item.orderid}
+             )
+         </foreach >
+    </insert>
+    <insert id="addTotal" parameterType="com.rng2.order.bean.TotalOrder">
+        insert into totalorder
+        (orderid, start, `end`, ordertime, shopid, house, info, userid, totalPrice, totalNum, totalVolume, status)
+        values
+        (#{orderid}, #{start}, #{end}, #{ordertime}, #{shopid}, #{house}, #{info}, #{userid}, #{totalPrice}, #{totalNum}, #{totalVolume}, #{status})
+    </insert>
+    <select id="findtotal" parameterType="com.rng2.order.bean.Select" resultType="com.rng2.order.bean.TotalOrder">
+        select orderid, userid, `start`, `end`, ordertime, totalorder.shopid, house, info, totalPrice, totalNum, totalVolume, shop.shopname, warehouse.name as housename, login.name, login.account, status
+        from totalorder, shop, warehouse, login
+        where shop.shopid=totalorder.shopid and warehouse.id = totalorder.shopid and totalorder.userid=login.id
+        <if test="userid != null and userid != 0">
+            and userid = #{userid}
+        </if>
+        <if test="orderid != null and orderid != ''">
+            and orderid = #{orderid}
+        </if>
+        <if test="timestart != null">
+            and ordertime &gt;= #{timestart}
+        </if>
+        <if test="timeend != null">
+            and ordertime &lt;= #{timeend}
+        </if>
+        <if test="status != null and status != ''">
+            and status = #{status}
+        </if>
+        <if test="pricelow != null and pricelow != ''">
+            and totalPrice &gt;= #{pricelow}
+        </if>
+        <if test="pricehigh != null and pricehigh != ''">
+            and totalPrice &lt;= #{pricehigh}
+        </if>
+        <if test="other != null and other != ''">
+            and status != #{other}
+        </if>
+        order by ordertime
+    </select>
+</mapper>

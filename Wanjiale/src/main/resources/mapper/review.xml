@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rng2.order.dao.ReviewDao">
+    <update id="sta">
+        update totalorder set
+        status = #{status}
+        <if test="content != ''">
+            ,reviewcontent = #{content}
+        </if>
+        where orderid = #{orderid}
+    </update>
+
+    <select id="detail" parameterType="java.lang.String" resultType="com.rng2.order.bean.Detail">
+        select orderid, num, houseid, products.id, code, model, category, quantity, invoicing, amount, volume
+        from `order`, products
+        where orderid = #{orderid} and `order`.productid = products.id
+    </select>
+</mapper>

@@ -1,0 +1,23 @@
+server:
+  port: 8082
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/order?serverTimezone=Hongkong
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: rootcuit
+  jpa:
+    show-sql: true
+  mvc:
+    static-path-pattern: /image/**
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+#  configuration:
+#    map-underscore-to-camel-case: true
+logging:
+  level:
+    com.rng2.order.dao: debug
+
