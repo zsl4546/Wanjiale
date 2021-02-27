@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.editor.account.repository.LoginRepository">
+    <select id="findUser" resultType="com.editor.account.bean.User" parameterType="com.editor.account.bean.User">
+        select * from login where account=#{account} and password=#{password}
+    </select>
+    <select id="findUserByAccount" parameterType="java.lang.String" resultType="com.editor.account.bean.User">
+        select * from login where account = #{account}
+    </select>
+
+    <select id="checkUser" parameterType="java.lang.String" resultType="com.editor.account.bean.User">
+        select * from login where account=#{account}
+    </select>
+
+    <select id="findAllUser" resultType="com.editor.account.bean.User">
+        select *
+        from login
+        where 1 = 1
+        <if test="account != ''">
+            and `account` = #{account}
+        </if>
+        <if test="phone != ''">
+            and phone = #{phone}
+        </if>
+        <if test="mechanism != ''">
+            and mechanism = #{mechanism}
+        </if>
+        <if test="status != ''">
+            and status = #{status}
+        </if>
+    </select>
+
+    <update id="changeStatus" parameterType="com.editor.account.bean.User">
+        update login set status = #{status} where `account` = #{account}
+    </update>
+    <delete id="deleteUser" parameterType="java.lang.String">
+        delete from login where `account` = #{account}
+    </delete>
+
+    <insert id="addUser" parameterType="com.editor.account.bean.User">
+        insert into login(`account`, password, admin, `name`, mechanism, sex, phone, mail, chara_name, status)
+        values (#{account}, #{password}, #{admin}, #{name}, #{mechanism}, #{sex}, #{phone}, #{mail}, #{charaName}, #{status})
+    </insert>
+
+</mapper>

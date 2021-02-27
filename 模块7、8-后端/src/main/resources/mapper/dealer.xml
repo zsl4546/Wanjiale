@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.editor.account.repository.DealerRepository">
+    <select id="findDealer" resultType="com.editor.account.bean.Dealer" parameterType="com.editor.account.bean.Dealer">
+        select * from mdealer where account = #{account} and password = #{password}
+    </select>
+
+    <select id="findAllClient" resultType="com.editor.account.bean.Client">
+        select * from client
+    </select>
+
+    <select id="findClient" parameterType="java.lang.String" resultType="com.editor.account.bean.Client">
+        select cc.code, cc.name, cc.quota, cc.ship_amount, cc.discount_amount, cc.pay, cc.info
+        from client as cc, c_d_relationship as cd
+        where cd.account = #{account}
+    </select>
+
+    <select id="findClientChild" parameterType="java.lang.String" resultType="com.editor.account.bean.Client">
+         select DISTINCT cc.code, cc.name, cc.quota, cc.ship_amount, cc.discount_amount, cc.pay, cc.info
+         from mdealer as m1,c_d_relationship as cd, client as cc
+         where m1.account in (
+             select account from mdealer as m2
+             where m2.father_account = #{account}
+         ) and cd.code = cc.code
+         UNION
+         select cc.code, cc.name, cc.quota, cc.ship_amount, cc.discount_amount, cc.pay, cc.info
+         from client as cc, c_d_relationship as cd
+         where cd.account = #{account}
+    </select>
+    <update id="changePass" parameterType="com.editor.account.bean.Dealer">
+        update mdealer set password = #{password} where account = #{account}
+    </update>
+
+    <select id="findDealers" resultType="com.editor.account.bean.Dealer">
+        select * from mdealer
+        where 1=1
+        <if test="fatherAccount != '' and fatherAccount != null">
+            and father_account = #{fatherAccount}
+        </if>
+        <if test="account != ''">
+            and account = #{account}
+        </if>
+        <if test="status != ''">
+            and status = #{status}
+        </if>
+        <if test="name != ''">
+            and `name` = #{name}
+        </if>
+        <if test="phone != ''">
+            and phone = #{phone}
+        </if>
+    </select>
+
+    <update id="changeStatus" parameterType="com.editor.account.bean.Dealer">
+        update mdealer set status = #{status} where account = #{account}
+    </update>
+
+    <delete id="deleteDealer" parameterType="java.lang.String">
+        delete from mdealer where account = #{account}
+    </delete>
+
+    <select id="checkDealer" parameterType="java.lang.String" resultType="com.editor.account.bean.Dealer">
+        select * from mdealer where account = #{account}
+    </select>
+
+    <insert id="addDealer" parameterType="com.editor.account.bean.Dealer">
+        insert into mdealer(`account`, password, `name`, phone, mail, status, `type`, `father_account`)
+        values (#{account}, #{password}, #{name}, #{phone}, #{mail}, #{status}, #{type}, #{fatherAccount})
+    </insert>
+
+    <delete id="deleteRelationship" parameterType="java.lang.String">
+        delete from c_d_relationship where account = #{account}
+    </delete>
+
+    <insert id="addRelationship" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into c_d_relationship(code, account) 
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.code},#{item.account})
+        </foreach>
+    </insert>
+
+    <select id="findAutho" parameterType="java.lang.String" resultType="java.lang.String">
+        select code from c_d_relationship where account = #{account}
+    </select>
+</mapper>

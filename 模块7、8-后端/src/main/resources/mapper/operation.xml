@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.editor.account.repository.OperationRepository">
+    <select id="findAllCharasName" resultType="java.lang.String">
+        select `name` from chara
+    </select>
+    <select id="findCharas" resultType="com.editor.account.bean.Chara" parameterType="com.editor.account.bean.Chara">
+        select `name`, status, description
+        from chara
+        where 1 = 1
+        <if test="name != ''">
+            and `name` = #{name}
+        </if>
+        <if test="status != ''">
+            and status = #{status}
+        </if>
+    </select>
+    <update id="changeStatus" parameterType="com.editor.account.bean.Chara">
+        update chara set status = #{status} where `name` = #{name}
+    </update>
+    <delete id="deleteChara" parameterType="com.editor.account.bean.Chara">
+        delete from chara where `name` = #{name}
+    </delete>
+
+    <select id="findMechanism" parameterType="com.editor.account.bean.Chara" resultType="java.lang.String">
+        select mechanism from s_me where chara_name = #{name}
+    </select>
+
+    <select id="findPage" parameterType="com.editor.account.bean.Chara" resultType="java.lang.String">
+        select page from s_page where chara_name = #{name}
+    </select>
+
+    <select id="findAllMechanism" resultType="java.lang.String">
+        select `name` from mechanism
+    </select>
+
+    <select id="findAllPage" resultType="java.lang.String">
+        select `name` from page
+    </select>
+
+    <delete id="deleteMechanism" parameterType="java.lang.String">
+        delete from s_me where chara_name = #{name}
+    </delete>
+
+    <delete id="deletePage" parameterType="java.lang.String">
+        delete from s_page where chara_name = #{name}
+    </delete>
+    
+    <insert id="insertMechanism" parameterType="com.editor.account.bean.Mechanism">
+        insert into s_me (chara_name, mechanism) values (#{charaName}, #{mechanism})
+    </insert>
+
+    <insert id="insertPage" parameterType="com.editor.account.bean.Page">
+        insert into s_page (chara_name, page) values (#{charaName}, #{page})
+    </insert>
+
+    <insert id="addChara" parameterType="com.editor.account.bean.Chara">
+        insert into chara(`name`, status, description) values (#{name}, #{status}, #{description})
+    </insert>
+</mapper>
